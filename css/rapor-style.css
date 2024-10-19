@@ -1,0 +1,44 @@
+.rapor-login-form input[type=email],.rapor-login-form input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.rapor-login-form input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.rapor-login-form input[type=submit]:hover {
+  background-color: #45a049;
+}
+.rapor-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+.avatar {
+    vertical-align: middle;    
+    border-radius: 50%;
+  }
+.rapor-content{
+  width: 100%;
+}
+.rapor-container .text-container h2{
+	font-size: 14px;
+}
+@media (max-width: 800px) {
+    .rapor-container {
+      flex-direction: column;
+    }
+  }

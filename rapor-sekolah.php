@@ -233,14 +233,31 @@ add_shortcode('rapor_access_form', function() {
     if (isset($_SESSION[RAPOR_SESSION_KEY]) && $_SESSION[RAPOR_SESSION_KEY] === true && isset($_SESSION[RAPOR_SESSION_ID])) {
         $post_id = $_SESSION[RAPOR_SESSION_ID];
         $post = get_post($post_id);
-        if ($post) {
-            echo '<h2>' . esc_html($post->post_title) . '</h2>';
-            echo '<div>' . wp_kses_post($post->post_content) . '</div>';
+        if ($post) {             
             ?>
-            <form method="POST" action="">
-                <input type="hidden" name="rapor_logout_nonce" value="<?php echo wp_create_nonce(RAPOR_LOGOUT_NONCE); ?>">
-                <input type="submit" name="logout" value="Logout">
-            </form>
+            <div class="rapor-container">                              
+                <div class="avatar-container">
+                    <?php
+                    // Display the featured image as an avatar
+                    if (has_post_thumbnail($post_id)) {
+                        echo get_the_post_thumbnail($post_id, array(250, 250), array('class' => 'avatar')); // Change 'full' to your preferred size
+                    }
+                    ?>
+                    <div class="text-container">
+                        <h2><?php echo esc_html($post->post_title); ?></h2>
+                        <h2><?php echo esc_html(get_post_meta($post_id, '_nisn', true)); ?></h2>
+                    </div>
+                </div>                
+                <div class="rapor-content">
+                    <?= wp_kses_post($post->post_content) ?>
+                </div>
+                <div class="rapor-logout">
+                    <form method="POST" action="" class="logout-form">
+                        <input type="hidden" name="rapor_logout_nonce" value="<?php echo wp_create_nonce(RAPOR_LOGOUT_NONCE); ?>">
+                        <input type="submit" name="logout" value="Logout">
+                    </form>
+                </div>
+            </div>
             <?php
         }
     } else {
@@ -251,7 +268,7 @@ add_shortcode('rapor_access_form', function() {
         }
         // Display login form
         ?>
-        <form method="POST" action="">
+        <form method="POST" action="" class="rapor-login-form">
             <input type="hidden" name="rapor_login_nonce" value="<?php echo wp_create_nonce(RAPOR_LOGIN_NONCE); ?>">
             <label for="email_siswa">Email:</label>
             <input type="email" id="email_siswa" name="email_siswa" required><br>            
@@ -300,3 +317,11 @@ add_action('admin_enqueue_scripts', function() {
     wp_enqueue_script('check-email-script', plugin_dir_url(__FILE__) . 'js/check-email.js', array('jquery'), null, true);
     wp_localize_script('check-email-script', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
 });
+
+// Enqueue the JavaScript and CSS for the plugin
+add_action('wp_enqueue_scripts', 'rapor_enqueue_styles');
+
+function rapor_enqueue_styles() {
+    // Enqueue the CSS file
+    wp_enqueue_style('rapor-custom-style', plugin_dir_url(__FILE__) . 'css/rapor-style.css');
+}
