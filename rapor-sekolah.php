@@ -17,6 +17,26 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+// Activation hook to display instructions
+register_activation_hook(__FILE__, 'rapor_activation_notice');
+
+function rapor_activation_notice() {
+    add_option('rapor_activation_notice', true);
+}
+
+// Admin notice function
+add_action('admin_notices', 'rapor_admin_notice');
+
+function rapor_admin_notice() {
+    if (get_option('rapor_activation_notice')) {
+        ?>
+        <div class="notice notice-success is-dismissible">
+            <p><?php _e('Rapor Sekolah plugin activated! Please create a page named "Rapor" and add the shortcode <code>[rapor_access_form]</code> to it to use the plugin.', 'rapor'); ?></p>
+        </div>
+        <?php
+        delete_option('rapor_activation_notice'); // Remove the option to avoid showing it again
+    }
+}
 
 // Define constants
 define('RAPOR_LOGIN_NONCE', 'rapor_login');
@@ -65,11 +85,14 @@ function rapor_fields_callback($post) {
 
     $email_siswa = get_post_meta($post->ID, '_email_siswa', true);
     $password_siswa = get_post_meta($post->ID, '_password_siswa', true);
+    $nisn = get_post_meta($post->ID, '_nisn', true);
 
     echo '<label for="email_siswa">Email Siswa</label>';
     echo '<input type="email" id="email_siswa" name="email_siswa" value="' . esc_attr($email_siswa) . '" size="25" />';
     echo '<button type="button" id="check_email" class="button">Check Email</button>';
     echo '<div id="email_check_result"></div><br>';
+    echo '<label for="nisn">NISN</label>';
+    echo '<input type="text" id="nisn" name="nisn" value="' . esc_attr($nisn) . '" size="25" /> <br><br>';
     echo '<label for="password_siswa">Password Siswa</label>';
     echo '<input type="password" id="password_siswa" name="password_siswa" value="' . esc_attr($password_siswa) . '" size="25" />';
 }
@@ -115,6 +138,11 @@ add_action('save_post', function($post_id) {
         
         // Save the email if it's unique
         update_post_meta($post_id, '_email_siswa', $email_siswa);
+    }
+
+    if (isset($_POST['nisn'])) {
+        $nisn = sanitize_text_field($_POST['nisn']);
+        update_post_meta($post_id, '_nisn', $nisn); // Save NISN to post meta
     }
 
     // Save the password as usual
